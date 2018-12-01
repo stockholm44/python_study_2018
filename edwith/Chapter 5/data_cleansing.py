@@ -101,6 +101,7 @@ edges["weight_sign"] = edges["weight"].map(weight_dict)
 edges
 
 edges = pd.get_dummies(edges)
+edges
 edges.as_matrix()
 # 위의 경우 color와 weight 모두 각각 one-hot encoding 됨.
 

@@ -77,6 +77,7 @@ plt.legend(shadow=True, fancybox=False, loc="upper right")
 # 3. 그래프 스타일도 지정가능
 # Scatter
 data_1 = np.random.rand(512, 2)
+data_1
 data_2 = np.random.rand(512, 2)
 
 plt.scatter(data_1[:,0], data_1[:,1], c="b", marker="x")

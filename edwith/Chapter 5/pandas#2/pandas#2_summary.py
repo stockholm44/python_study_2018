@@ -47,6 +47,7 @@ h_index.swaplevel().sortlevel(0)
 # - Groupby에 의해 Split된 상태를 추출 가능함
 
 grouped = df.groupby("Team")
+
 for name,group in grouped:
     print (name)
     print (group)
@@ -96,6 +97,7 @@ df.groupby('Team').filter(lambda x: x['Rank'].mean() < 2)
 # !wget https://www.shanelynn.ie/wp-content/uploads/2015/06/phone_data.csv
 df_phone = pd.read_csv("C:/djangocym/study_2018/lab_bla/data/phone_data.csv")
 df_phone.head()
+df_phone
 
 import dateutil
 df_phone['date'] = df_phone['date'].apply(dateutil.parser.parse, dayfirst=True)
