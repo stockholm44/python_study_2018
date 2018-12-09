@@ -14,7 +14,10 @@ get_rating_matrix(filename)
 def get_frequent_matrix(filename, dtype=np.float32):
     df_data = pd.read_csv(filename, sep=',', header=0)
     df = pd.DataFrame(df_data)
+    print(df)
+
     df_groupby = df.groupby(["source","target"])["target"].count()
+    print(df.target.unique().sort())
     df_matrix = df_groupby.unstack()
     return np.array(df_matrix)
 filename = 'C:/study_2018/python_study_2018/edwith/Chapter 6/3_lab_bulid_matrix/1000i.csv'
