@@ -14,6 +14,7 @@ boston = load_boston()
 boston.keys()
 #위 키중 feature이름들이 있는 feature_names를 로드해보자.
 boston.feature_names
+boston.target
 # 보스토 데이타셋에서 data로 data를, 컬럼은 feature_names로 DataFrame을 만들자.
 df = pd.DataFrame(boston.data, columns=boston.feature_names)
 df.head()
@@ -31,7 +32,8 @@ lr_ne = LinearRegression(fit_intercept=True)
 
 from sklearn.model_selection import train_test_split
 # 테스트셋 나누기.
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=0)
+
 # train data로 피팅하기.
 lr_ne.fit(X_train,y_train)
 # 위 결과 y_hat에 저장.
@@ -50,7 +52,7 @@ mse = sklearn.metrics.mean_squared_error(y_hat, y_true)
 mse
 
 # y_true와 y_hat으로 scatter그래프 그리고 라벨 대충 붙여넣기
-plt.scatter(y_true, y_hat, s=10)
+plt.scatter(y_true, y_hat, s=20)
 plt.xlabel("Prices: $Y_i$")
 plt.ylabel("Predicted prices: $\hat{Y}_i$")
 plt.title("Prices vs Predicted prices: $Y_i$ vs $\hat{Y}_i$")
