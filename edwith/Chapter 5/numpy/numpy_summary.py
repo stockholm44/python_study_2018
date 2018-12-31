@@ -281,7 +281,7 @@ a[b] # bracket index, ,b 배열의 값을 index로 하여 a의 값들을 추출�
 a.take(b) # take함수 : bracket index와 같은효과 -> 요걸더 권장. a[b]는 좀 헷갈림.
 
 # fancy index를 matrix형태로도 가능.
-a = np.array([[1, 4], [9, 16]], float)
+a = np.array[[1, 4], [9, 16]], float)
 b = np.array([0, 0, 1, 1, 0], int)
 c = np.array([0, 1, 1, 1, 1], int)
 a[b,c] # b를 row index, c를 column index로 변환하여 표시함

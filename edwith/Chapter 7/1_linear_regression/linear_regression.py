@@ -72,7 +72,7 @@ def cost_function(h, y):
 h = hypothesis_function(X,w)
 # 22. cost_function 실행하되 위에서 만든 h와 y로 해보자.
 cost_function(h,y)
-
+w
 
 
 
@@ -102,15 +102,15 @@ def gradient_descent(X, y, w, alpha, iterations):
             cost_list.append(cost)
 
     return theta, theta_list, cost_list
-
+w
 # DO Linear regression with GD
-# 24. iteration 10000, alpha 0.001로 지정.
+# 24. iterations 10000, alpha 0.001로 지정.
 iterations = 10000
 alpha = 0.001
 
 # 25 theta, theta_list, cost_list를 gradient_descent로 받기.변수는 변수들그대로,
 theta, theta_list, cost_list = gradient_descent(X, y, w, alpha, iterations)
-
+theta
 # 26. cost에 cost_function으로 만든걸로 값넣기.
 cost = cost_function(hypothesis_function(X, w), y)
 

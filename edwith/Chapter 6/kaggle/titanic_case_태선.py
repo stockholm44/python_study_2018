@@ -15,10 +15,10 @@ import matplotlib.pyplot as plt
 # Linear Regression Model
 # Regularization Models
 # Ensemble Models
-# '''
 
+#
 # About dataset
-
+#
 # Variable	Definition	Key
 # survival	Survival	0 = No, 1 = Yes
 # pclass	Ticket class	1 = 1st, 2 = 2nd, 3 = 3rd
@@ -31,13 +31,18 @@ import matplotlib.pyplot as plt
 # cabin	Cabin number
 # embarked	Port of Embarkation	C = Cherbourg, Q = Queenstown, S = Southampton
 
+
 test_df = pd.read_csv('C:/study_2018/python_study_2018/edwith/Chapter 5/kaggle/test.csv')
 train_df = pd.read_csv('C:/study_2018/python_study_2018/edwith/Chapter 5/kaggle/train.csv')
 
 y_train_df = train_df.pop("Survived")
 y_train_df
+train_df.columns
+train_df.columns
 
-train_df.Cabin
+train_df.Pclass.unique()
+train_df.Sex.unique()
+train_df.SibSp.unique()
 
 pd.set_option('display.float_format', lambda x: '%.2f' % x)
 test_df.head()
@@ -73,7 +78,7 @@ all_df = pd.concat((train_df, test_df), axis=0)
 # train_df -> training DataFrame -> survived 데이타 있음. fitting용 데이터
 # test_df -> test DataFrame -> survived 없다.
 # all_df -> training + test DataFrame -> survived 없다. feature를 한꺼번에 바꾸기 위해 합침.
-         # ->  나중에 train_index, test_index로 나눠서 따로 저장할 수 있을듯.
+#          ->  나중에 train_index, test_index로 나눠서 따로 저장할 수 있을듯.
 
 all_df.head()
 all_df = all_df.set_index(all_df["PassengerId"])
