@@ -221,12 +221,12 @@ df.sex.unique()
 df["sex_code"] =  df.sex.map({"male":0, "female":1}) # 제일많이쓰는 테크닉. 데이터 컨버젼. 아래와 같이 replace도가능
 df.head(5)
 df.sex.replace({"male":0, "female":1}).head()
-# -> inpla  ce=True쓰고 sex_code지우면 완전히 대체도 가능. 예제로 쓰장.!! del index["sex_code"]
+# -> inplace=True쓰고 sex_code지우면 완전히 대체도 가능. 예제로 쓰장.!! del index["sex_code"]
 
 
 
 # Apply for DataFrame
- # -> map과 달리 series전체 column에 해당함수를 적용
+ # -> map과 달리 series전체 co   lumn에 해당함수를 적용
  # - 입력값이 series데이터로 입력받아 handling 가능.
  #연산할때 보통 쓰는듯.
  # 컬럼의 통계치 사용시 많이씀.

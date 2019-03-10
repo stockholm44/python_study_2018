@@ -20,9 +20,9 @@ df
 df.groupby("Team")["Points"].sum() #한개로도 모을수 있고
 df.groupby(["Team","Year"])["Points"].sum()  #여러개로도 모을수 있다.
 
-Hierarchical index
-- Groupby 명령의 결과물도 결국은 dataframe
-- 두 개의 column으로 groupby를 할 경우, index가 두개 생성
+# Hierarchical index
+# - Groupby 명령의 결과물도 결국은 dataframe
+# - 두 개의 column으로 groupby를 할 경우, index가 두개 생성
 
 
 h_index = df.groupby(["Team", "Year"])["Points"].sum()
