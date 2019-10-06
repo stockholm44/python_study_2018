@@ -32,7 +32,8 @@ def get_nk(path):
 
     n = nk[:, 0]
     k = nk[:, 1]
-    nk_complex = n + k * (1j) * (-1)
+    nk_complex = n + k * (1j)
+#    nk_complex = n + k * (1j) * (-1)
     return nk_complex.reshape(-1, 1) # (101, 2)
 
 # (101, 1) 차원으로 nk에서 real part만 가져와서 n값을 가져오는 method
@@ -88,14 +89,20 @@ class Interface_Matrix:
         return ((self.nk_left)*np.cos(self.theta1) - (self.nk_right)*np.cos(self.theta2)) /  ((self.nk_left)*np.cos(self.theta1) + (self.nk_right)*np.cos(self.theta2))
     
     def r_p(self):
-        return ((self.nk_left)*np.cos(self.theta2) - (self.nk_right)*np.cos(self.theta1)) /  ((self.nk_left)*np.cos(self.theta2) + (self.nk_right)*np.cos(self.theta1))
+#        return ((self.nk_left)*np.cos(self.theta2) - (self.nk_right)*np.cos(self.theta1)) /  ((self.nk_left)*np.cos(self.theta2) + (self.nk_right)*np.cos(self.theta1))
+        result =  (np.square(self.nk_right)*self.nk_left*np.cos(self.theta1) - np.square(self.nk_left)*self.nk_right*np.cos(self.theta2))/ \
+                  (np.square(self.nk_right)*self.nk_left*np.cos(self.theta1) + np.square(self.nk_left)*self.nk_right*np.cos(self.theta2))
+        return result
     
     def t_s(self):
         return (2 * (self.nk_left)*np.cos(self.theta1))/((self.nk_left)*np.cos(self.theta1) + (self.nk_right)*np.cos(self.theta2))
 
     def t_p(self):
-        return (2 * (self.nk_left)*np.cos(self.theta1))/((self.nk_left)*np.cos(self.theta2) + (self.nk_right)*np.cos(self.theta1))
-
+#        return (2 * (self.nk_left)*np.cos(self.theta1))/((self.nk_left)*np.cos(self.theta2) + (self.nk_right)*np.cos(self.theta1))
+        result = (2 * self.nk_left * self.nk_right * (self.nk_left * np.cos(self.theta1))) / \
+                 (np.square(self.nk_right) * (self.nk_left * np.cos(self.theta2)) + np.square(self.nk_left) * (self.nk_right * np.cos(self.theta1)))
+        return result
+    
     def matrix(self, sp):
         if sp == 's':
             result_b = 1 / self.t_s() * np.array([[ones(), self.r_s()], [self.r_s(), ones()]])
