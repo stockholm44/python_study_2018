@@ -25,14 +25,10 @@ class Intensity:
         self.layers_B = args[1]
 
     def system_matrix(self, sp, *layers):
-#        print("args \n", args)
-#        print("type of args \n", type(args))
-#        print("args[0] \n", args[0])
-#        print("type of args[0] \n", type(args[0]))
         result = layers[0].matrix(sp)
         for i in range(1, len(layers)):
             result = result @ layers[i].matrix(sp)
-        return np.einsum('kij->ijk', result) # ???????????? Interface랑 Layer가 101,2,2인데 왜 einsum 하지? 차원나중에 확인 해서 없엘수 있음 없에자.
+        return np.einsum('kij->ijk', result) 
 
     def rt_A(self, sp):
         system_matrix = self.system_matrix(sp, *self.layers_A)
@@ -61,15 +57,18 @@ class Intensity:
         
     def R_A(self, sp):
         r_A, _  = self.rt_A(sp)
-        return np.square(np.absolute(r_A)).reshape(-1, 1)
+        return np.square(abs(r_A)).reshape(-1, 1)
 
     def R_B(self, sp):
         r_B, _  = self.rt_B(sp)
-        return np.square(np.absolute(r_B)).reshape(-1, 1)
+        return np.square(abs(r_B)).reshape(-1, 1)
 
     def T_B(self, sp):
         _ , t_B  = self.rt_B(sp)
-        return np.square(np.absolute(t_B)).reshape(-1, 1) # ★★★★★이재호C꺼에는 줄줄이 뭐가 달려있다. 
+        a = (1/get_n(self.nk_e)).reshape(-1,1)
+        b = (np.square(abs(t_B))).reshape(-1,1)
+        return a * b
+#        return np.square(abs(t_B)).reshape(-1, 1) # ★★★★★이재호C꺼에는 줄줄이 뭐가 달려있다. 
     
     def pi_A(self, sp):
         r_A, _  = self.rt_A(sp)
@@ -92,7 +91,7 @@ class Intensity:
         pi_B  = self.pi_B(sp)
         result = 2 * np.pi / wavelength() * 2 * get_n(self.nk_e) * self.Z \
                + 2 * np.pi / wavelength() * 2 * get_n(self.nk_e) * self.z_ex \
-               - self.pi_A(sp) - self.pi_B(sp)
+               + self.pi_A(sp) + self.pi_B(sp)
         return result
         # ★★★★df 를 받았을때 
         # 1. d계산을 위해 organic/coherent, cathode등 layer이름세분화하고 
@@ -101,7 +100,7 @@ class Intensity:
     # ★ 이재호 책임거 마니 배낌요 
     def f_TB(self, sp):        
         result = 1 + self.R_A(sp) + 2 * np.sqrt(self.R_A(sp)) \
-                 * np.cos(-self.pi_A(sp) + (4 * np.pi * get_n(self.nk_e) * self.Z * np.cos(self.theta))/wavelength())
+                 * np.cos(self.pi_A(sp) + (4 * np.pi * get_n(self.nk_e) * self.Z * np.cos(self.theta))/wavelength())
         return result
 #        return 2 * k(self.nk_e, self.theta) * self.z_ex + self.pi_A(sp)
 
@@ -110,11 +109,15 @@ class Intensity:
         return result
 #        return 2 * k(self.nk_e, self.theta) * self.Z + self.pi_A(sp) + self.pi_B(sp)
 
-
+    def solid_angle(self):
+        return 1 * np.cos(theta_ex)/(np.square(self.nk_e) * np.cos(self.theta))
+        
+        
+    
     # I_p 부분의 일부분들이 p가 아닌 그냥 s로 되어있음. 위에 시스템 메트릭스부터 쭉 수정해야하는데 일단 임시로 현버전으로 진행
     def intensity(self):
-        I_s = self.pl * self.f_TB('s') * self.f_FP('s')
-        I_p = self.pl * self.f_TB('p') * self.f_FP('p')
+        I_s = self.pl * self.f_TB('s') * self.f_FP('s') * self.solid_angle()
+#        I_p = self.pl * self.f_TB('p') * self.f_FP('p')
 
 #        I_s = self.pl * self.f_TB('s') * self.f_FP('s') * \
 #              3/(16 * np.pi) * self.horizontal_dipole_ratio
@@ -131,7 +134,7 @@ class Intensity:
 #              self.T_B('p') * (1 + self.R_A('p') + 2 * np.sqrt(self.R_A('p')) * np.cos(self.pi_TB_A('p'))) / \
 #              (1 + self.R_A('p') * self.R_B('p') - 2 * np.sqrt(self.R_A('p')) * np.sqrt(self.R_B('p'))* np.cos(self.pi_FP('p'))) * \
 #              (self.horizontal_dipole_ratio * 3/(16 * np.pi) * np.square(np.cos(self.theta)) + (1 - self.horizontal_dipole_ratio) * 3 /(8 * np.pi) * np.square(np.sin(self.theta)))
-        return I_s + I_p
+        return I_s
 
 if __name__ == '__main__':    
     # n, k값의 경로와 PL의 경로
@@ -163,9 +166,9 @@ if __name__ == '__main__':
 #    m6 = Layer_Matrix(ito, 120, theta_ex)
 #    m7 = Interface_Matrix(ito, glass, theta_ex)
 
-    m1 = Interface_Matrix(npd, npd, theta_ex)    #1
+    m1 = Interface_Matrix(al, npd, theta_ex)    #1
     m2 = Layer_Matrix(npd, 203, theta_ex)        #2
-    m3 = Interface_Matrix(npd, al, theta_ex)  #3  
+    m3 = Interface_Matrix(npd, npd, theta_ex)  #3  
  
     m4 = Layer_Matrix(npd, 212, theta_ex)         #4
     m5 = Interface_Matrix(npd, ito, theta_ex)
@@ -174,9 +177,9 @@ if __name__ == '__main__':
 
     
 #    layer_A = [m1, m2, m3]
-    layer_A = [m1, m2, m3]
+    layer_A = [m1]
 #    layer_B = [m3, m4, m5, m6, m7]
-    layer_B = [m1, m4, m5, m6, m7]
+    layer_B = [m5, m6, m7]
     
     layers = [layer_A, layer_B]
 
@@ -264,107 +267,26 @@ if __name__ == '__main__':
     plt.show()
     
     
+    # 5. Final Intensity @ view Angle
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    x = np.arange(380, 784, 4).reshape(-1,1)
+        
+    for theta in [0,15,30,45,60]:
+        int_temp = Intensity(YG_PL, npd, 203, 212, theta, 0.67, *layers)    
     
-#    for i in [10,20,30,40,50,60,70,80,90,100]:
-#        for j in [10,20,30,40,50,60,70,80,90,100]:
-#            theta_ex = 0
-#            m1 = Interface_Matrix(al, npd, theta_ex)    #1
-#            m2 = Layer_Matrix(npd, i, theta_ex)        #2
-#            m3 = Interface_Matrix(npd, npd, theta_ex)  #3  
-#            m4 = Layer_Matrix(npd, j, theta_ex)         #4
-#            m5 = Interface_Matrix(npd, ito, theta_ex)
-#            m6 = Layer_Matrix(ito, 120, theta_ex)
-#            m7 = Interface_Matrix(ito, glass, theta_ex)
-#            
-#            layer_A = [m1, m2, m3]
-#            layer_B = [m3, m4, m5, m6, m7]
-#            
-#            layers = [layer_A, layer_B]
-#        
-#         
-#            int_temp = Intensity(YG_PL, npd, i, j, 0, 0.67, *layers)    
-#            
-#            # 1. R_A(Al), R_B(ITO), T_B(ITO)     
-#            fig = plt.figure()
-#            ax = fig.add_subplot(111)
-#            x = np.arange(380, 784, 4).reshape(-1,1)
-#            y1 = int_temp.R_A('s')
-#            y2 = int_temp.R_B('s')
-#            y3 = int_temp.T_B('s')
-#            
-#            ax.plot(x, y1, label='R_A')
-#            ax.plot(x, y2, label='R_B')
-#            ax.plot(x, y3, label='T_B')
-#        #    
-#            name = str(i), str(j), "R_A, R_B, T_B"
-#            ax.set_title(name)
-#            ax.set_xlabel('Wavelength')
-#            ax.set_ylabel('Intensity')
-#            ax.legend()
-#            
-#            plt.show()
-#            
-#            # 2. pi_A, pi_B, pi_total
-#            fig = plt.figure()
-#            ax = fig.add_subplot(111)
-#            x = np.arange(380, 784, 4).reshape(-1,1)
-#            y1 = int_temp.pi_A('s')
-#            y2 = int_temp.pi_B('s')
-#            y3 = int_temp.pi_total('s')
-#            
-#            ax.plot(x, y1, label='pi_A')
-#            ax.plot(x, y2, label='pi_B')
-#            ax.plot(x, y3, label='pi_total')
-#            
-#            name = str(i),str(j), "pi_A/B/total"
-#            ax.set_title(name)
-#            ax.set_xlabel('Wavelength')
-#            ax.set_ylabel('Intensity')
-#            ax.legend()
-#            
-#            plt.show()
-#            
-#            # 3. f_FP, f_TB
-#            fig = plt.figure()
-#            ax = fig.add_subplot(111)
-#            x = np.arange(380, 784, 4).reshape(-1,1)
-#            y1 = int_temp.f_FP('s')
-#            y2 = int_temp.f_TB('s')
-#            y3 = int_temp.intensity()
-#            
-#            ax.plot(x, y1, label='f_FP')
-#            ax.plot(x, y2, label='f_TB')
-#            ax.plot(x, y3, label='Intensity')
-#            
-#            name = str(i) , str(j), "f_FP/TB & Intensity"
-#            ax.set_title(name)
-#            ax.set_xlabel('Wavelength')
-#            ax.set_ylabel('Intensity')
-#            ax.legend()
-#            
-#            plt.show()
-#            
-#            
-#            # 4. Final Intensity
-#            YG_EL_path = "../nk/YG_EL.csv"
-#            YG_EL_temp = pd.read_csv(YG_EL_path, sep=',', header=None)
-#            YG_EL = YG_EL_temp.values[1:, 1].astype(np.float64).reshape(-1,1)
-#            
-#            
-#            fig = plt.figure()
-#            ax = fig.add_subplot(111)
-#            x = np.arange(380, 784, 4).reshape(-1,1)
-#            y1 = int_temp.intensity()
-#        
-#            ax.plot(x, y1/np.max(y1), label='Coherent_Sim_result')
-#            ax.plot(x, YG_PL/np.max(YG_PL), label='YG_PL')
-#            ax.plot(x, YG_EL/np.max(YG_EL), label='YG_EL')
-#        #    
-#            name = str(i) , str(j) , "Cavity Simulation(Labview vs Python)"
-#            ax.set_title(name)
-#            ax.set_xlabel('Wavelength')
-#            ax.set_ylabel('Intensity')
-#            ax.legend()
-#            
-#            plt.show()
+        y1 = int_temp.intensity()
+    
+        ax.plot(x, y1, label=theta)
+         
+    ax.set_title("Cavity Simulation(@ View Angle)")
+    ax.set_xlabel('Wavelength')
+    ax.set_ylabel('Intensity')
+    ax.legend()
+    
+    plt.show()
 
+    
+#-------------------------------------------#
+#    a = int_temp.system_matrix_2('s', *int_temp.layers_A)
+#    print(a)
